@@ -5,6 +5,12 @@
     {% csrf_token %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
+    h4, h6{
+        font-family: 'Gowun Dodum', sans-serif;
+    }
+    h5{
+        font-family: 'Noto Sans KR', sans-serif;
+    }
     .badge{
         margin-right: 5px;
         margin-bottom: 5px;
@@ -78,6 +84,10 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis; /* 두 줄 이상의 텍스트는 ...으로 표시 */
+    }
+
+    #add-button{
+        font-family: 'Noto Sans KR', sans-serif;
     }
     </style>
 {% endblock %}
@@ -282,12 +292,12 @@
                     </div>
                     <div class="card-footer">
                         <div class="row">
-                        <div class="col-sm">
-                            <a href="${food.url}" class="card-link">원본 링크</a>
-                        </div>
-                        <div class="col-sm text-right">
-                            <a href="" class="card-link">어울리는 요리</a>
-                        </div>
+                            <div class="col-sm-4">
+                                <a href="${food.url}" class="card-link">링크</a>   
+                            </div>
+                            <div class="col-sm-8 text-right">
+                                <a href="/withs/${food.id}" class="card-link">어울리는 요리</a>
+                            </div>
                         </div>
                     </div>
                     </div>

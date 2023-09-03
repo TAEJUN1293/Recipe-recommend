@@ -6,4 +6,5 @@ from . import views
 app_name = 'visualization'
 urlpatterns = [
     path('find', views.find, name="find"),
+    path('boxplot', views.boxplot, name="boxplot")
 ]

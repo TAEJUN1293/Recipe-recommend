@@ -1,0 +1,211 @@
+{% extends 'header.html' %}
+
+
+{% block header %}
+{% csrf_token %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+    h4, h5, h6{
+        font-family: 'Gowun Dodum', sans-serif;
+    }
+    #title {
+    font-size: 25px;
+    font-family: 'Noto Sans KR', sans-serif;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; 
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    }
+    #sub-title {
+    font-size: 20px;
+    font-family: 'Noto Sans KR', sans-serif;
+    display: -webkit-box;
+    -webkit-line-clamp: 1; 
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    }
+    .recommend-container{
+        height: 130px;
+    }
+    #rec-img{
+        height: 130px;
+        border-radius: 10px;
+    }
+    .rec-info{
+        position: relative;
+        height: 130px;
+    }
+    #main-img{
+        height: 350px;
+    }
+    #little{
+        font-size: 12px;
+    }
+    #main-date{
+        text-align: right;
+    }
+    a {
+    text-decoration-line: none;
+    color: black;
+    }
+    </style>
+{% endblock %}
+
+{% block nav %}
+{% for head in heads %}
+{% if head.now %}
+<li class="nav-item"><a href="{{head.url}}" class="nav-link active" aria-current="page">{{head.tag}}</a></li>
+{% else %}
+<li class="nav-item"><a href="{{head.url}}" class="nav-link">{{head.tag}}</a></li>
+{% endif %}
+{% endfor %} 
+{% endblock %}
+
+{% block main %}
+<div class="container mx-auto">
+    <div class="info-container">
+        <div class="row">
+            <div class="col-7">
+                <a href="{{result.url}}"><img id="main-img" class="d-block w-100" src="{{result.img}}" onerror="this.onerror=null; this.src='static/img/noi.jpg'" alt=""></a>
+                <p></p>
+                <a href="{{result.url}}"><h4 id="title">{{result.name}}</h4></a>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">{{result.category_type}}</li>
+                        <li class="breadcrumb-item">{{result.category_situation}}</li>
+                        <li class="breadcrumb-item">{{result.category_ingredient}}</li>
+                        <li class="breadcrumb-item">{{result.category_method}}</li>
+                    </ol>
+                </nav>
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <h5>{{result.answer}}</h5>
+                        </div>
+                        <div class="col">
+                            <h6 id="main-date">{{result.date}}</h6>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="visualization-container">
+                    <div class="views">
+                        <h6>조회수 : {{result.views}}</h6>
+                        <div class="views-graph"></div>
+                    </div>
+                    <div class="rating">
+                        <h6>레시피 추천 정도 : {{result.rating}}</h6>
+                        <div class="rating-graph"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-5">
+                <h4>어울리는 요리</h4>
+                {% for food in rel %}
+                <div class="recommend-container mb-2">
+                    <div class="row">
+                        <div class="col-5">
+                            <a href="{% url 'main:withs' food.id %}"><img id="rec-img" class="d-block w-100" src="{{food.img}}" onerror="this.onerror=null; this.src='https://3.bp.blogspot.com/-ZKBbW7TmQD4/U6P_DTbE2MI/AAAAAAAADjg/wdhBRyLv5e8/s1600/noimg.gif'" alt=""></a>
+                        </div>
+                        <div class="col-7">
+                            <div class="rec-info">
+                                <a href="{{food.url}}"><h4 id="sub-title">{{food.name}}</h4></a>
+                                <h6>{{food.answer}}</h6>
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li id="little" class="breadcrumb-item">{{food.category_type}}</li>
+                                        <li id="little" class="breadcrumb-item">{{food.category_situation}}</li>
+                                        <li id="little" class="breadcrumb-item">{{food.category_ingredient}}</li>
+                                        <li id="little" class="breadcrumb-item">{{food.category_method}}</li>
+                                    </ol>
+                                </nav>
+                                <h6 class="date">{{food.date}}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+window.addEventListener('DOMContentLoaded', function() {
+    function adjustContainerSize(){
+        var headerWidth = document.querySelector('header').offsetWidth;
+        var cardContainer = document.querySelector('.info-container');
+        cardContainer.style.width = headerWidth + 'px';
+    };
+    adjustContainerSize();
+
+    window.addEventListener('resize', adjustContainerSize);
+      
+});
+function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+document.addEventListener("DOMContentLoaded", function () {
+        var id = "{{result.id}}";
+        const apiUrl = "/visualization/boxplot";
+        let csrftoken = getCookie('csrftoken');
+
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-CSRFToken": csrftoken
+            },
+            body: JSON.stringify([id])
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data)
+            data.result.forEach(element => {
+            // 박스 플롯을 그릴 데이터
+            console.log(element)
+            var data = [
+                {
+                    label: 'Box Plot',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    outlierRadius: 5,
+                    data: [element.mini, element.q1, element.q2, element.q3, element.maxi]
+                }
+            ];
+            var ctx = document.getElementById(`${element}-graph`).getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'horizontalBoxplot',
+                data: {
+                    labels: ['Values'],
+                    datasets: data
+                }
+            });
+            });
+        })
+        .catch(error => {
+            console.error('에러 발생:', error);
+        });
+    });
+
+
+</script>
+{% endblock %}
+    

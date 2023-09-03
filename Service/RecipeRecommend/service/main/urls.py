@@ -10,5 +10,5 @@ urlpatterns = [
     path('recent/', views.index, name='index'),
     path('prefer/', views.index, name='index'),
     path('recommend/', views.recommend, name="recommend"),
-    path('with/', views.withs, name="withs"),
+    path('withs/<int:food_id>/', views.withs, name="withs"),
 ]
